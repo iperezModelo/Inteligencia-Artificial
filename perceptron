@@ -1,0 +1,110 @@
+import numpy as np
+#**************************************
+#SECCIÓN 1 
+#En esta primera sección se elabora el algoritmo base de funcionamiento de 
+#un perceptrón 
+
+
+#Con esta función se realiza el producto punto de las entradas 
+def valor_h(x,w,b): 
+    suma=0
+    mul= np.multiply(w,x)
+    for a in mul:
+        suma=suma+a
+    suma=suma+b
+    return suma
+
+#El resultado del producto punto pasa por esta función que realiza el cálculo
+#para la función logística, que no es la mejor ni la más exacta, pero si la 
+#más sencilla 
+def func_logistica(x):
+    res=1/(1+np.exp(-x))
+    return res
+
+
+#******************************************************************
+#SECCIÓN 2. ERROR Y CORRECCIÓN DE PESOS. 
+#En esta sección se calcula el error con base en las entradas y pesos propuestos. 
+#Posteriormente se hace la compensación de los pesos para reducir el error. 
+#Como parte del cálculo del error, se usa la fórmula cuadrática para este. 
+
+
+
+#Cálculo del error. 
+#Por medio de esta función se calcula el error de los pesos propuestos para las 
+#variables de entrada
+def error_calculo(valor_esperado, resultado):
+    calc=(valor_esperado-resultado)
+    err=pow(calc,2)
+    return err
+
+
+#Reducción del error
+#1. Término de reducción d=(y-y`)(f'(h))
+#La derivada de la función logística es f(h)(1-f(h))
+def delta(valor_esperado,resultado):
+    coef_err=(valor_esperado-resultado)*(resultado*(1-resultado))
+    return coef_err
+
+#Calcular el incremento de los pesos
+def incremento(etha, delta, xi):
+    x = etha*delta*xi
+    return x
+
+#Aplicar el incremento a los pesos y así obtener nuevos incrementos
+def nuevosPesos(peso_anterior,incremento):
+    nuevos_pesos=peso_anterior+incremento
+    return nuevos_pesos 
+
+
+
+#*******************************************************************
+#SECCIÓN 3. PRUEBA DEL PERCEPTRÓN
+
+
+#Probando el algoritmo
+#Aquí se le da valor a las variables de entrada, peso, valor esperado y bias o sesgo
+entradas=np.array([0.2,0.6])
+pesos= np.array([0.1,0.05])
+bias=np.array([1])
+v_esp=0.95
+
+#Primer Cálculo 
+#Aquí se realiza el primer cálculo con el perceptrón, así como el error que produce
+h=valor_h(entradas, pesos, bias)
+red= func_logistica(h)
+erro= error_calculo(v_esp,red)
+#En esta sección se imprimen los resultados obtenidos para la primera iteración con el perceptrón
+print('Estos son los resultados para la primera iteración')
+print('El producto punto es ' , h)
+print('El resultado de la primera iteración de la red neuronal es', red)
+print ('El error en la primera iteración es: ', erro)
+
+
+#Se hacen los cálculos para el ajuste de los pesos, basado en el método de gradiente decreciente
+delt=delta(0.95,red)
+inc= incremento(0.8,delt,entradas)
+pesos=nuevosPesos(pesos,inc)
+print('Los nuevos pesos son: ', pesos)
+
+
+
+#Se entrenó a la red neuronal para pasar por 400 épocas 
+for a in range(0,400):
+    h=valor_h(entradas, pesos, bias)
+    red= func_logistica(h)
+    erro= error_calculo(v_esp,red)
+
+    delt=delta(0.95,red)
+    inc= incremento(0.8,delt,entradas)
+
+    pesos=nuevosPesos(pesos,inc)
+
+
+print('')
+print('*******************************')
+print('Estos son los resultados para la última iteración iteración')
+print('El producto punto es ' , h)
+print('El resultado de la ultima iteración de la red neuronal es', red)
+print ('El error en la ultima iteración es: ', erro)
+print('Los pesos para lograr este error son: ', pesos)
